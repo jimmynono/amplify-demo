@@ -35,21 +35,97 @@ app.get('/get-artist', (req, res) => { //Line 9
    
 }); 
 
+app.post('/get-setlist/', (req, res) => {
+    console.log(req.body)
+    // const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=${req.body.artist}&date=${req.body.date}`;
+    const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=st vincent&date=18-01-2018`;
+    const options = {
+        headers: {
+        'x-api-key': 'K9NST_x7oePpsrr_Wqx0ggZWupxPUZPRxFxI',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+        }
+    }
+
+    axios.get(apiUrl, options).then(response => {
+        const songs = response.data.setlist[0].sets.set.map(segment => {
+            return segment.song.map(song => song)
+        }).flat();
+
+        const returnVal = {
+            concertInfo: {
+                artistName: response.data.setlist[0].artist.name,
+                artistId: response.data.setlist[0].artist.mbid,
+                date: response.data.setlist[0].eventDate,
+                venue: response.data.setlist[0].venue.name
+            },
+            setlist: songs
+
+        }        
+        res.json(returnVal)
+    }).then(
+        
+    )
+
+})
+
 app.post('/create-playlist', async (req, res) => {
-    axios({
+    const {artist, date, venue} = req.body.concertData.concertInfo;
+    const createdPlaylist = await axios({
         method: 'post',
         url: `https://api.spotify.com/v1/users/${process.env.REACT_APP_USER_ID}/playlists`,
         headers: {'Authorization': `Bearer ${req.body.token}`},
         data: {
-            'name': 'hi there james norton',
+            'name': `${artist}-${venue}-${date}`,
             'description': "Testing",
             "public": true
         }
+    });
+
+    const createdPlaylistId = createdPlaylist.data.id;
+    const setListSongs = req.body.concertData.setlist;
+
+    const setListSongsId = await Promise.allSettled(setListSongs.map(async (song, idx) => {
+        const songToParse = await axios({
+            method: 'get',
+            headers: {'Authorization': `Bearer ${req.body.token}`},
+            url: `https://api.spotify.com/v1/search?q=${song.name}&artist=${req.body.concertData.concertInfo.artist}&type=track&limit=50`,
+        })
+
+        let id = ''
+        songToParse.data.tracks.items.forEach((item, idx) => {
+            item.album.artists.forEach(artist => {
+                if (artist.name.toUpperCase() === req.body.concertData.concertInfo.artist.toUpperCase() ) {
+                    id = `spotify:track:${songToParse.data.tracks.items[idx].id}`
+                }
+            })
+        })
+
+        return id;
+        
+    })).then();
+
+    const uriArr = setListSongsId.filter(songId => {
+        return songId ? `${songId.value}` : null
     })
+    const uriStr = uriArr.map(item => {
+        console.log(item)
+        return `${item.value}`
+    })
+
+    await axios({
+        method: 'post',
+        headers: {'Authorization': `Bearer ${req.body.token}`},
+        url: `https://api.spotify.com/v1/playlists/${createdPlaylistId}/tracks`,
+        data: {
+            uris: [...uriStr]
+        }
+    })
+
+    res.sendStatus(200)
 })
 
 app.post('/get-spotify', async (req, res) => {
-    // debugger;
     const {code} = req
     const redirect_uri = 'http://localhost:3000';
 

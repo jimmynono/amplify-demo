@@ -1,3 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+
+li {
+  list-style: none;
+}
+
 .App {
   text-align: center;
 }
@@ -7,14 +15,10 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
 
 .App {
-  background-color: #282c34;
+  background-color: pink;
+  background-color: #b3252E;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -22,11 +26,93 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  padding: 2rem;
+}
+
+.head,
+.cabinet {
+  width: 80%;
   background-color: black;
   background-image: radial-gradient(black 40%, #34424d 50%, transparent 15%),
     radial-gradient(black 40%, #34424d 50%, transparent 40%);
   background-size: 20px 20px;
   background-position: 0 0, 10px 10px;
+  border: 25px solid rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  position: relative;
+}
+
+.head::after {
+  height: 10px;
+  width: 80px;
+  background-color: grey;
+  content: '';
+  display: inline-block;
+  position: absolute;
+  bottom: -35px;
+  left: 50px;
+}
+
+.head::before {
+  height: 10px;
+  width: 80px;
+  background-color: grey;
+  content: '';
+  display: inline-block;
+  position: absolute;
+  bottom: -35px;
+  right: 50px;
+}
+
+.head-container::before {
+  height: 8px;
+  width: 420px;
+  background-color: grey;
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: -33px;
+  right: calc(50% - 210px);
+}
+
+.head-container::after {
+  height: 20px;
+  width: 320px;
+  background-color: transparent;
+  background: -webkit-linear-gradient(90deg, black 60%, #b3252E 33%);
+  border: 16px solid black;
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: -52px;
+  right: calc(50% - 176px);
+  border-radius: 34px;
+}
+
+
+.head .showing-setlist {
+  border: 100px solid black;
+}
+
+.cabinet {
+  width: 90%;
+  margin-top: 10px;
+  height: 666px;
+  overflow-y: scroll;
+}
+
+.cabinet h2 {
+  font-size: 3.5rem;
+  margin: 1rem;
+  font-weight: 500;
+}
+
+.cabinet h4 {
+  margin: 1rem;
+  font-family: 'Roboto', sans-serif;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  padding-bottom: 1rem;
+
 }
 
 
@@ -47,15 +133,17 @@
 h1 {
   font-size: 10rem;
   font-weight: 500;
+  margin-block: 3.33rem;
 }
 
 .power-light {
-  height: 30px;
-  width: 30px;
+  height: 40px;
+  width: 40px;
   border: 5px solid #e6aa4b;
+  border: 5px solid #b3252E;
   border-radius: 50px;
   background-color: black;
-  transition-duration: 2s;
+  transition-duration: 3s;
   transition-property: background-color;
 }
 
@@ -81,4 +169,102 @@ button {
   text-transform: uppercase;
   margin-top: 1rem;
   color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: dimgrey;
+  cursor: not-allowed;
+}
+
+.control-panel {
+  background-color: #b8ae79;
+  width: 75%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: .25rem 3rem;
+  border-radius: 5px;
+}
+
+.control-panel label {
+  font-family: 'Roboto', sans-serif;
+  color: black;
+  font-size: 1rem;
+  text-transform: uppercase;
+  margin-right: .66rem;
+}
+
+.control-panel input {
+  margin-right: .66rem;
+  height: 35px;
+  padding: 5px;
+}
+
+input[type="date"],
+input[type="text"],
+li {
+  font-family: 'Roboto', sans-serif;
+
+}
+
+.control-panel p {
+  font-family: 'Roboto', sans-serif;
+  color: black;
+  font-size: .66rem;
+}
+
+.control-button-container {
+  width: 66.6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 3rem;
+}
+
+.control-button {
+  margin: 0;
+  padding: 0;
+  height: 40px;
+  width: 40px;
+  border: 5px solid black;
+  border-radius: 50px;
+  background-color: goldenrod;
+  color: black;
+  font-weight: 900;
+  font-size: 1.125rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transform: rotate(45deg);
+  transition-duration: 1s;
+  transition-property: transform;
+
+}
+
+.logged-out {
+  transform: rotate(-45deg);
+  transition-duration: 1s;
+  transition-property: transform;
+
+}
+
+.control-button-values {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.setlist-form {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+}
+
+.setlist-form button {
+  margin-top: 0;
+  margin-left: .66rem;
 }
