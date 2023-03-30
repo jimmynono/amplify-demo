@@ -28,17 +28,16 @@ app.get('/get-artist', (req, res) => { //Line 9
     }
 
     axios.get(apiUrl, options).then(response => {
-        console.log("axios, ",response.data);
         // res.send(JSON.stringify(response.data))
         res.send({hi: 'james'})
     })
    
 }); 
 
-app.post('/get-setlist/', (req, res) => {
-    console.log(req.body)
-    // const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=${req.body.artist}&date=${req.body.date}`;
-    const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=st vincent&date=18-01-2018`;
+app.post('/get-setlist/', async (req, res) => {
+    console.log("GETTING SETLIST", req.body)
+    const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=${req.body.artist}&date=${req.body.date}`;
+    // const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=st vincent&date=18-01-2018`;
     const options = {
         headers: {
         'x-api-key': 'K9NST_x7oePpsrr_Wqx0ggZWupxPUZPRxFxI',
@@ -47,11 +46,13 @@ app.post('/get-setlist/', (req, res) => {
         }
     }
 
-    axios.get(apiUrl, options).then(response => {
+    
+    await axios.get(apiUrl, options).then(response => {
+        console.log("GOT DATA?", response.data)
         const songs = response.data.setlist[0].sets.set.map(segment => {
             return segment.song.map(song => song)
         }).flat();
-
+        
         const returnVal = {
             concertInfo: {
                 artistName: response.data.setlist[0].artist.name,
@@ -60,13 +61,10 @@ app.post('/get-setlist/', (req, res) => {
                 venue: response.data.setlist[0].venue.name
             },
             setlist: songs
-
-        }        
-        res.json(returnVal)
-    }).then(
-        
-    )
-
+            
+        }   
+        res.status(200).json(returnVal)
+    })
 })
 
 app.post('/create-playlist', async (req, res) => {
@@ -95,7 +93,7 @@ app.post('/create-playlist', async (req, res) => {
         let id = ''
         songToParse.data.tracks.items.forEach((item, idx) => {
             item.album.artists.forEach(artist => {
-                if (artist.name.toUpperCase() === req.body.concertData.concertInfo.artist.toUpperCase() ) {
+                if (req.body.concertData.concertInfo.artist.toUpperCase().includes(artist.name.toUpperCase()) ) {
                     id = `spotify:track:${songToParse.data.tracks.items[idx].id}`
                 }
             })
@@ -103,13 +101,12 @@ app.post('/create-playlist', async (req, res) => {
 
         return id;
         
-    })).then();
+    })).catch(err => res.send(err));
 
     const uriArr = setListSongsId.filter(songId => {
         return songId ? `${songId.value}` : null
     })
     const uriStr = uriArr.map(item => {
-        console.log(item)
         return `${item.value}`
     })
 
@@ -121,8 +118,7 @@ app.post('/create-playlist', async (req, res) => {
             uris: [...uriStr]
         }
     })
-
-    res.sendStatus(200)
+    res.status(200).json({playlistLink: `open.spotify.com/playlist/${createdPlaylistId}`})
 })
 
 app.post('/get-spotify', async (req, res) => {
@@ -141,7 +137,6 @@ app.post('/get-spotify', async (req, res) => {
       
           res.json({ access_token, refresh_token, expires_in })
     } catch(err) {
-        console.err(err)
         res.sendStatus(400)
     }
     res.sendStatus(200)

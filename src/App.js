@@ -2,22 +2,18 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import SetListForm from './components/SetListForm';
+import Loader from './components/Loader';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [token, setToken] = useState("");
   const [setList, setSetList] = useState([]);
   const [artistInfo, setArtistInfo] = useState({})
+  const [loading, toggleLoading] = useState(false)
+  const [showSpotifyLinkButton, toggleShowSpotifyLinkButton] = useState(false);
+  const [spotifyUrl, setSpotifyUrl] = useState('')
   const redirect_uri = 'http://localhost:3000';
-
-  let url = "https://accounts.spotify.com/authorize";
-  url += "?client_id=" + process.env.REACT_APP_CLIENT_ID;
-  url += "&response_type=token";
-  url += "&redirect_uri=" + encodeURI(redirect_uri);
-  url += "&show_dialog=true";
-  url += "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private playlist-modify-public playlist-modify-private";
-
-  
+    
   useEffect(() => {
     if (!loggedIn && token) {
       setLoggedIn(!loggedIn);
@@ -40,41 +36,54 @@ function App() {
     }
   }, [])
 
-  const handleSpotify = () => {
-    const payload = {
-      'token': token
-    }
-    axios.post('/create-playlist', payload).then(res => console.log(res.data))
-  }
 
-  const handleGetSetlist = async (artist, date) => {
+  const handleGetSetlist = (artist, date) => {
+    setSetList([])
+    toggleLoading(true)
     const dateArr = date.split('-');
     const setListFormatDate = `${dateArr[2]}-${dateArr[1]}-${dateArr[0]}`;
     const payload = {
       artist: artist,
       date: setListFormatDate
-        }
-    const concertData = await axios.post('/get-setlist/', payload);
-    console.log(concertData)
-    setSetList(concertData.data.setlist)
-    setArtistInfo({
-      artist: concertData.data.concertInfo.artistName,
-      date: concertData.data.concertInfo.date,
-      venue: concertData.data.concertInfo.venue
-    })
-
-
+    }
+    
+    
+    axios.post('/get-setlist/', payload).then(concertData => {      
+      setSetList([...concertData.data.setlist])
+      setArtistInfo({
+        artist: concertData.data.concertInfo.artistName,
+        date: concertData.data.concertInfo.date,
+        venue: concertData.data.concertInfo.venue
+      })
+      toggleShowSpotifyLinkButton(false)
+        toggleLoading(false)
+      }).catch(err => {
+        toggleLoading(false)
+        alert('Concert does not exist');
+      })
+    
   }
   
-  const handleMakePlaylist = async () => {
+  const handleMakePlaylist = async e => {
+    e.preventDefault()
+    toggleLoading(true)
     const dataToSubmit = {
       setlist: [...setList],
       concertInfo: {   
       ...artistInfo}
     }
 
-    await axios.post('/create-playlist', {'token': token, 'concertData': dataToSubmit})
+    try {
+      const playlistCreated = await axios.post('/create-playlist', {'token': token, 'concertData': dataToSubmit})
+      setSpotifyUrl(`http://${playlistCreated.data.playlistLink}`)
+      toggleShowSpotifyLinkButton(true)
+      
+      alert('Playlist created')
+    } catch (err) {
+      alert('You are logged out of spotify')
+    }
 
+    toggleLoading(false)
   }
 
   const handleLogout = () => {
@@ -87,11 +96,20 @@ function App() {
     if (token) {
       handleLogout()
     } else {
+      let url = "https://accounts.spotify.com/authorize";
+      url += "?client_id=" + process.env.REACT_APP_CLIENT_ID;
+      url += "&response_type=token";
+      url += "&redirect_uri=" + encodeURI(redirect_uri);
+      url += "&show_dialog=true";
+      url += "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private playlist-modify-public playlist-modify-private";
+    
       window.location.href = url
     }
   }
 
-  console.log(artistInfo)
+  const handleOpenSpotifyLink = () => {
+    window.open(spotifyUrl, '_blank')
+  }
 
 
   return (
@@ -101,7 +119,7 @@ function App() {
 
       <h1>SpotifyMySetlist</h1>
       <div className='control-panel'>
-          {loggedIn && <SetListForm handleFormSubmit={(artist, date) => handleGetSetlist(artist, date)} hasSetList={setList.length} handleMakePlaylist={handleMakePlaylist}/>}
+          {loggedIn && <SetListForm handleFormSubmit={(artist, date) => handleGetSetlist(artist, date)} hasSetList={setList.length} handleMakePlaylist={handleMakePlaylist} showSpotifyLinkButton={showSpotifyLinkButton} handleOpenSpotifyLink={handleOpenSpotifyLink}/>}
         <div className='control-button-container'>
           <p className='control-button-values'><span>NO</span><span >YES</span></p>
           <button className={`control-button ${loggedIn ? '' : 'logged-out'}`} onClick={handleLogInClick}>|</button>
@@ -114,21 +132,21 @@ function App() {
  
    <div className='cabinet'>
       <h2>Setlist</h2>
+      <div className='cabinet-container'>
+      {loading && <Loader />}
       {setList.length ?
         <div>
         <h4>{artistInfo.artist} at {artistInfo.venue} - {artistInfo.date}</h4>
         <ul>
           {setList.map(song => {
-            return <li>{song.name}</li>
+            return <li key={song.name}>{song.name}</li>
           })}
         </ul>
         </div> : null
       }
-      
-    </div>
-    
-
       </div>
+          </div>
+        </div>
   );
 }
 
