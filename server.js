@@ -2,7 +2,6 @@ const dotenv = require('dotenv');
 const express = require('express'); //Line 1
 const app = express(); //Line 2
 const port = process.env.PORT || 5150; //Line 3
-const http = require('https');
 const axios = require('axios');
 const SpotifyWebApi = require('spotify-web-api-node');
 const cors = require('cors')
@@ -37,7 +36,6 @@ app.get('/get-artist', (req, res) => { //Line 9
 app.post('/get-setlist/', async (req, res) => {
     console.log("GETTING SETLIST", req.body)
     const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=${req.body.artist}&date=${req.body.date}`;
-    // const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=st vincent&date=18-01-2018`;
     const options = {
         headers: {
         'x-api-key': 'K9NST_x7oePpsrr_Wqx0ggZWupxPUZPRxFxI',

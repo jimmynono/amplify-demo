@@ -5,6 +5,7 @@ import SetListForm from './components/SetListForm';
 import Loader from './components/Loader';
 
 function App() {
+  const redirect_uri = 'http://localhost:3000';
   const [loggedIn, setLoggedIn] = useState(false)
   const [token, setToken] = useState("");
   const [setList, setSetList] = useState([]);
@@ -12,11 +13,15 @@ function App() {
   const [loading, toggleLoading] = useState(false)
   const [showSpotifyLinkButton, toggleShowSpotifyLinkButton] = useState(false);
   const [spotifyUrl, setSpotifyUrl] = useState('')
-  const redirect_uri = 'http://localhost:3000';
+  const [showAnimation, toggleShowAnimation] = useState(false)
     
   useEffect(() => {
     if (!loggedIn && token) {
       setLoggedIn(!loggedIn);
+
+      setInterval(() => {
+        toggleShowAnimation(true)
+      }, 3000);
     }
     
   },[loggedIn, token])
@@ -91,8 +96,8 @@ function App() {
     setToken('')
     window.location.href = redirect_uri;
   }
-
-  const handleLogInClick = () => {
+  
+  const handleLogInClick = (e) => {
     if (token) {
       handleLogout()
     } else {
@@ -111,7 +116,6 @@ function App() {
     window.open(spotifyUrl, '_blank')
   }
 
-
   return (
     <div className="App">
       <div className='head'>
@@ -122,7 +126,7 @@ function App() {
           {loggedIn && <SetListForm handleFormSubmit={(artist, date) => handleGetSetlist(artist, date)} hasSetList={setList.length} handleMakePlaylist={handleMakePlaylist} showSpotifyLinkButton={showSpotifyLinkButton} handleOpenSpotifyLink={handleOpenSpotifyLink}/>}
         <div className='control-button-container'>
           <p className='control-button-values'><span>NO</span><span >YES</span></p>
-          <button className={`control-button ${loggedIn ? '' : 'logged-out'}`} onClick={handleLogInClick}>|</button>
+          <button className={`control-button ${loggedIn ? 'logged-in' : 'logged-out'}`} onClick={handleLogInClick}>|</button>
           <p>LOGGED IN</p>
         </div>
         <div className={`power-light ${loggedIn ? 'power-on' : ''}`}></div>
@@ -132,7 +136,7 @@ function App() {
  
    <div className='cabinet'>
       <h2>Setlist</h2>
-      <div className='cabinet-container'>
+      <div className={`cabinet-container ${showAnimation ? 'animate-speaker' : ''}`}>
       {loading && <Loader />}
       {setList.length ?
         <div>
