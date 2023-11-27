@@ -20,7 +20,7 @@ app.get('/get-artist', (req, res) => { //Line 9
     const apiUrl = `https://api.setlist.fm/rest/1.0/artist/b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d`
     const options = {
         headers: {
-        'x-api-key': 'K9NST_x7oePpsrr_Wqx0ggZWupxPUZPRxFxI',
+        'x-api-key': 'WCDspU6cH5BSqsbsQN4-uT14QUVa7mvYRaJN',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
         }
@@ -38,7 +38,7 @@ app.post('/get-setlist/', async (req, res) => {
     const apiUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistName=${req.body.artist}&date=${req.body.date}`;
     const options = {
         headers: {
-        'x-api-key': 'K9NST_x7oePpsrr_Wqx0ggZWupxPUZPRxFxI',
+        'x-api-key': 'WCDspU6cH5BSqsbsQN4-uT14QUVa7mvYRaJN',
         'Accept': 'application/json',
         'Content-Type': 'application/json'
         }
