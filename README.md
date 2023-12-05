@@ -1,6 +1,6 @@
 # Hackathon Project
 
-Creates spotify playlist based on a concert entered by the user.
+Creates spotify playlist based on a concert entered by the user. For DEMO USE ONLY
 
 ## Available Scripts
 
