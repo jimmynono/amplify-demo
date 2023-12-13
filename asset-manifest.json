@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/amplify-demo/static/css/main.ea894a86.css",
-    "main.js": "/amplify-demo/static/js/main.8df1ba4f.js",
+    "main.css": "/amplify-demo/static/css/main.956fa949.css",
+    "main.js": "/amplify-demo/static/js/main.0377805d.js",
     "static/js/787.fe0f0f22.chunk.js": "/amplify-demo/static/js/787.fe0f0f22.chunk.js",
     "static/media/Amplify_PersonalUseOnly.ttf": "/amplify-demo/static/media/Amplify_PersonalUseOnly.ee2913fedf36ebdce0d2.ttf",
     "index.html": "/amplify-demo/index.html",
-    "main.ea894a86.css.map": "/amplify-demo/static/css/main.ea894a86.css.map",
-    "main.8df1ba4f.js.map": "/amplify-demo/static/js/main.8df1ba4f.js.map",
+    "main.956fa949.css.map": "/amplify-demo/static/css/main.956fa949.css.map",
+    "main.0377805d.js.map": "/amplify-demo/static/js/main.0377805d.js.map",
     "787.fe0f0f22.chunk.js.map": "/amplify-demo/static/js/787.fe0f0f22.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ea894a86.css",
-    "static/js/main.8df1ba4f.js"
+    "static/css/main.956fa949.css",
+    "static/js/main.0377805d.js"
   ]
 }
